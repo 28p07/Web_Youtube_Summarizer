@@ -1,0 +1,11 @@
+validators
+streamlit
+langchain
+langchain_community
+langchain_groq
+ipykernel
+getenv
+youtube_transcript_api
+unstructured
+transformers
+pytube
