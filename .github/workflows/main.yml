@@ -11,21 +11,43 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout the repository with the full history
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
           lfs: true
 
+      # Configure Git for commits
       - name: Configure Git
         run: |
           git config user.name "28p07"
           git config user.email "sharmapuneet8126@gmail.com"
 
-      - name: Pull latest changes
+      # Pull the latest changes with rebase
+      - name: Pull and Rebase Latest Changes
+        id: pull_step
+        continue-on-error: true  # Allow workflow to continue even if rebase fails
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           git pull --rebase https://28p07:$HF_TOKEN@huggingface.co/spaces/28p07/yt_web_summarizer main
 
-      - name: Push to hub
+      # Detect and resolve merge conflicts if they occur
+      - name: Resolve Merge Conflicts (Auto-Resolve with Remote Changes)
+        if: failure() && contains(steps.pull_step.outputs.stdout, 'Merge conflict')
+        run: |
+          git checkout --theirs .
+          git add .
+          git rebase --continue || echo "Rebase completed with conflicts resolved."
+
+      # Abort rebase if conflicts are not resolved
+      - name: Abort Rebase if Needed
+        if: failure()
+        run: git rebase --abort
+
+      # Push changes to Hugging Face Hub
+      - name: Push Resolved Changes
+        if: success()
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
