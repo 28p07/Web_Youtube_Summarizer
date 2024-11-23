@@ -19,19 +19,11 @@ jobs:
       - name: Configure Git
         run: |
           git config user.name "28p07"
-          git config user.email "sharmapuneet8126@gmai.com"
+          git config user.email "sharmapuneet8126@gmail.com"
 
-      - name: Pull latest changes with rebase
-        continue-on-error: true
+      - name: Pull latest changes
         run: |
-          git pull https://28p07:$HF_TOKEN@huggingface.co/spaces/28p07/yt_web_summarizer main --rebase
-
-      - name: Resolve conflict (keep remote changes)
-        if: failure() && contains(steps.pull.outputs.stdout, 'Merge conflict')
-        run: |
-          git checkout --theirs README.md
-          git add README.md
-          git rebase --continue
+          git pull --rebase https://28p07:$HF_TOKEN@huggingface.co/spaces/28p07/yt_web_summarizer main
 
       - name: Push to hub
         env:
