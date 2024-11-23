@@ -24,15 +24,15 @@ jobs:
           git config user.email "sharmapuneet8126@gmail.com"
 
       # Pull the latest changes with rebase
-      - name: Pull and Rebase Latest Changes
+      - name: Pull and Rebase from Remote
         id: pull_step
-        continue-on-error: true  # Allow workflow to continue even if rebase fails
+        continue-on-error: true  # Allow workflow to continue even if pull fails
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           git pull --rebase https://28p07:$HF_TOKEN@huggingface.co/spaces/28p07/yt_web_summarizer main
 
-      # Detect and resolve merge conflicts if they occur
+      # Handle conflicts if they arise
       - name: Resolve Merge Conflicts (Auto-Resolve with Remote Changes)
         if: failure() && contains(steps.pull_step.outputs.stdout, 'Merge conflict')
         run: |
@@ -40,15 +40,15 @@ jobs:
           git add .
           git rebase --continue || echo "Rebase completed with conflicts resolved."
 
-      # Abort rebase if conflicts are not resolved
+      # Abort rebase if conflicts are unresolved
       - name: Abort Rebase if Needed
         if: failure()
         run: git rebase --abort
 
-      # Push changes to Hugging Face Hub
-      - name: Push Resolved Changes
-        if: success()
+      # Force Push Resolved Changes
+      - name: Force Push to Hugging Face
+        if: success() || always()  # Ensure push happens after resolving or aborting conflicts
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          git push https://28p07:$HF_TOKEN@huggingface.co/spaces/28p07/yt_web_summarizer main
+          git push --force https://28p07:$HF_TOKEN@huggingface.co/spaces/28p07/yt_web_summarizer main
