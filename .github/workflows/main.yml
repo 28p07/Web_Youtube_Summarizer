@@ -1,4 +1,5 @@
 name: Sync to Hugging Face hub
+
 on:
   push:
     branches: [main]
@@ -9,12 +10,24 @@ on:
 jobs:
   sync-to-hub:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
           lfs: true
+
+      - name: Configure Git
+        run: |
+          git config user.name "28p07"
+          git config user.email "sharmapuneet8126@gmail.com"
+
+      - name: Pull latest changes from the remote
+        run: |
+          git pull https://28p07:$HF_TOKEN@huggingface.co/spaces/28p07/yt_web_summarizer main --rebase
+
       - name: Push to hub
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: git push https://28p07:$HF_TOKEN@huggingface.co/spaces/28p07/yt_web_summarizer main
+        run: |
+          git push https://28p07:$HF_TOKEN@huggingface.co/spaces/28p07/yt_web_summarizer main
