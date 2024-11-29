@@ -14,8 +14,11 @@ Short_description: Summarizer using LLM
     capabilities to extract and condense key information, enabling users to quickly grasp the essence of the content in 300 words.
 
 🛠️ Features
+
     Content Summarization: Summarize YouTube videos or web pages into concise summaries.
+    
     User-Friendly Interface: Intuitive Streamlit UI for smooth user interaction.
+    
     Automated Content Fetching: Dynamically loads and processes data from the provided URLs.
     Customizable Prompt: Uses a flexible prompt template to generate summaries.
 
